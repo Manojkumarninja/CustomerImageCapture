@@ -5,7 +5,7 @@ from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseUpload
 from googleapiclient.errors import HttpError
 
-_SCOPES = ["https://www.googleapis.com/auth/drive.file"]
+_SCOPES = ["https://www.googleapis.com/auth/drive"]
 
 
 def is_drive_configured() -> bool:
@@ -46,7 +46,12 @@ def upload_image(image_bytes: bytes, filename: str) -> str:
 
         file = (
             service.files()
-            .create(body=file_meta, media_body=media, fields="id")
+            .create(
+                body=file_meta,
+                media_body=media,
+                fields="id",
+                supportsAllDrives=True,   # required for Shared Drives
+            )
             .execute()
         )
         file_id = file["id"]
@@ -54,6 +59,7 @@ def upload_image(image_bytes: bytes, filename: str) -> str:
         service.permissions().create(
             fileId=file_id,
             body={"type": "anyone", "role": "reader"},
+            supportsAllDrives=True,
         ).execute()
 
         return f"https://drive.google.com/uc?export=view&id={file_id}"
