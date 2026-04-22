@@ -349,10 +349,14 @@ def show_capture_page():
         for i, key in enumerate(["ImageUrl1", "ImageUrl2", "ImageUrl3"], 1):
             url = customer.get(key)
             if url:
-                st.markdown(f"**Image {i}:** [🔗 View Image]({url})")
-                st.image(url, width=260)
+                st.markdown(
+                    f"**Image {i}:** &nbsp; "
+                    f"<a href='{url}' target='_blank'>🔗 Open in Google Drive</a>",
+                    unsafe_allow_html=True,
+                )
+                st.caption(f"Stored: {url}")
             else:
-                st.caption(f"Image {i}: —")
+                st.caption(f"Image {i}: Not captured yet")
 
         if st.session_state.role == "admin" and any(
             customer.get(k) for k in ["ImageUrl1", "ImageUrl2", "ImageUrl3"]
