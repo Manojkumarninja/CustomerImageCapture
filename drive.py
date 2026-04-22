@@ -49,20 +49,13 @@ def upload_image(image_bytes: bytes, filename: str) -> str:
             .create(
                 body=file_meta,
                 media_body=media,
-                fields="id",
-                supportsAllDrives=True,   # required for Shared Drives
+                fields="id,webViewLink",
+                supportsAllDrives=True,
             )
             .execute()
         )
-        file_id = file["id"]
 
-        service.permissions().create(
-            fileId=file_id,
-            body={"type": "anyone", "role": "reader"},
-            supportsAllDrives=True,
-        ).execute()
-
-        return f"https://drive.google.com/uc?export=view&id={file_id}"
+        return file.get("webViewLink", f"https://drive.google.com/file/d/{file['id']}/view")
 
     except HttpError as e:
         raise RuntimeError(f"Drive upload failed: {e}") from e
